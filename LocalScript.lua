@@ -1,18 +1,20 @@
 local Replicated = game:GetService('ReplicatedStorage')
-local Number = require(Replicated:WaitForChild('NumberFormat'))
+local Number = require(Replicated:WaitForChild('Number'))
+local Players = game:GetService('Players')
+local Player = Players.LocalPlayer
 
 local Clicks = Number.GetValue('Clicks')
 local ClickText = script.Parent.TextLabel
 local ClickPlus = Number.GetValue('ClickPlus')
 local ClickButton = script.Parent.TextButton
 
-Clicks:OnChanged(function(newValue, canNotation, canRound)
+Clicks:OnChanged(function(newValue, canRound, canNotation)
 	ClickText.Text = 'Clicks: ' .. Number.shortE(newValue, canRound, canNotation)
-end, ClickText, 1e3, true)
+end, ClickText)
 
-ClickPlus:OnChanged(function(newValue, canNotation, canRound)
+ClickPlus:OnChanged(function(newValue, canRound, canNotation)
 	ClickButton.Text = 'Clicks +' .. Number.shortE(newValue, canRound, canNotation)
-end, ClickButton, 1e3, true)
+end, ClickButton)
 
 -- this script is an example to push for example
 -- it will autopreset CanNotatoin but if u want to use custom Notation set u would need to set for ex
@@ -32,13 +34,13 @@ local Clicks = Number.GetValue('Clicks')
 local ClickText = script.Parent.TextLabel
 local ClickPlus = Number.GetValue('ClickPlus')
 local ClickButton = script.Parent.TextButton
+local startNotation = 1e50
 
-Clicks:OnChanged(function(newValue, canNotation, canRound)
+Clicks:OnChanged(function(newValue, canRound)
 	ClickText.Text = 'Clicks: ' .. Number.shortE(newValue, canRound)
-end, ClickText)
+end, ClickText, startNotation, true) to setup Notation to start at 1e50
 
-ClickPlus:OnChanged(function(newValue, canNotation, canRound)
+ClickPlus:OnChanged(function(newValue, canRound)
 	ClickButton.Text = 'Clicks +' .. Number.shortE(newValue, canRound)
-end, ClickButton)
-
+end, ClickButton, startNotation, true)
 ]]
