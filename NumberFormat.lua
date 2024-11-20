@@ -250,10 +250,10 @@ function Number.GetValue(valueName)
 end
 
 type labels = TextLabel|TextButton
-function Number:OnChanged(callBack: (property: string, canRound: boolean?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
+function Number:OnChanged(callBack: (property: string, canRound: boolean?, canNotation: number?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
 	canRound = canRound or true
 	Number.Changed(self.Instance, function(property)
-		callBack(property, canRound)
+		callBack(property, canRound, canNotation)
 	end)
 	if label then
 		local valueText = self.Name

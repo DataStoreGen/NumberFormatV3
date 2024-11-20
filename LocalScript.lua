@@ -1,7 +1,5 @@
 local Replicated = game:GetService('ReplicatedStorage')
 local Number = require(Replicated:WaitForChild('Number'))
-local Players = game:GetService('Players')
-local Player = Players.LocalPlayer
 
 local Clicks = Number.GetValue('Clicks')
 local ClickText = script.Parent.TextLabel
