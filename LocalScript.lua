@@ -21,3 +21,24 @@ end, ClickButton, 1e3, true)
 --OnChanged(function(newValue, canNotatoin, canRound)
 
 --end, label, 1e50, true)
+
+--[[ another examle if u want to preserver automation for Notation and also canRound
+local Replicated = game:GetService('ReplicatedStorage')
+local Number = require(Replicated:WaitForChild('NumberFormat'))
+local Players = game:GetService('Players')
+local Player = Players.LocalPlayer
+
+local Clicks = Number.GetValue('Clicks')
+local ClickText = script.Parent.TextLabel
+local ClickPlus = Number.GetValue('ClickPlus')
+local ClickButton = script.Parent.TextButton
+
+Clicks:OnChanged(function(newValue, canNotation, canRound)
+	ClickText.Text = 'Clicks: ' .. Number.shortE(newValue, canRound)
+end, ClickText)
+
+ClickPlus:OnChanged(function(newValue, canNotation, canRound)
+	ClickButton.Text = 'Clicks +' .. Number.shortE(newValue, canRound)
+end, ClickButton)
+
+]]
