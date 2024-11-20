@@ -12,6 +12,8 @@ local suffixes = {
 	"NoOg", "Ng", "UNg", "DNg", "QdNg", "QnNg", "SxNg", "SpNg", "OcNg",
 	"NoNg", "Ce", "UCe"
 }
+local Players = game:GetService('Players')
+local Player = Players.LocalPlayer
 
 local Number = {}
 
@@ -153,9 +155,12 @@ function Number.toNumber(value)
 	return (value[1] * (10^value[2]))
 end
 
-function Number.toNotation(value)
+function Number.toNotation(value, canRound: boolean?)
 	local toTable = Number.toTable(value)
 	local man, exp = toTable[1], toTable[2]
+	if canRound then
+		return Number.floor(man) .. 'e' .. exp
+	end
 	return man .. 'e' .. exp
 end
 
@@ -172,11 +177,10 @@ function Number.short(value)
 	return man .. suffix
 end
 	
-function Number.shortE(value: number, canNotation: number?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
+function Number.shortE(value: number, canRound: boolean?, canNotation: number?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
 	canNotation = canNotation or 1e6
-	value = Number.clamp(value, -canNotation, canNotation)
 	if math.abs(value) >= canNotation then
-		return Number.toNotation(value)
+		return Number.toNotation(value, canRound)
 	end
 	return Number.short(value)
 end
@@ -195,36 +199,68 @@ function Number.CorrectTime(value: number)
 	local minutes = math.floor((value % 3600) / 60)
 	local seconds = value % 60
 	local result = ""
-
+	local function appendTime(unit, label)
+		if unit > 0 then
+			result = result .. string.format(':%d%s', unit, label)
+		end
+	end
 	if days > 0 then
 		result = string.format('%dd', days)
-		if hours > 0 then
-			result = result .. string.format(':%dh', hours)
-		end
-		if minutes > 0 then
-			result = result .. string.format(':%dm', minutes)
-		end
-		if seconds > 0 then
-			result = result .. string.format(':%ds', seconds)
-		end
+		appendTime(hours, 'h')
+		appendTime(minutes, 'm')
+		appendTime(seconds, 's')
 	elseif hours > 0 then
 		result = string.format('%dh', hours)
-		if minutes > 0 then
-			result = result .. string.format(':%dm', minutes)
-		end
-		if seconds > 0 then
-			result = result .. string.format(':%ds', seconds)
-		end
+		appendTime(minutes, 'm')
+		appendTime(seconds, 's')
 	elseif minutes > 0 then
 		result = string.format('%dm', minutes)
-		if seconds > 0 then
-			result = result .. string.format(':%ds', seconds)
-		end
+		appendTime(seconds, 's')
 	else
 		result = string.format('%ds', seconds)
 	end
 	return result
 end
 
+function Number.percent(part, total, canRound: boolean?)
+	local value = (part / total) * 100
+	if canRound then
+		return Number.floor(value)
+	end
+	if value < 0.001 then return '0%' end
+	return value .. '%'
+end
+
+function Number.Changed(value, callBack: (property: string) -> ())
+	value.Changed:Connect(callBack)
+end
+
+Number.__index = Number
+function Number.GetValue(valueName)
+	local self = setmetatable({}, Number)
+	for _, names in pairs(Player:GetDescendants()) do
+		if names.Name == valueName then
+			self.Instance = names
+			self.Name = names.Name :: string
+			self.Value = names.Value :: number
+		end
+	end
+	return self
+end
+
+type labels = TextLabel|TextButton
+function Number:OnChanged(callBack: (property: string, canNotation: number?, canRound: boolean?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
+	Number.Changed(self.Instance, function(property)
+		callBack(property, canNotation, canRound)
+	end)
+	if label then
+		local valueText = self.Name
+		if valueText:find('Plus') then
+			label.Text = valueText:gsub('Plus', ''):gsub(':','') ..' +' .. Number.shortE(self.Value, canRound, canNotation)
+		else
+			label.Text = valueText .. ': ' .. Number.shortE(self.Value, canRound, canNotation)
+		end
+	end
+end
 
 return Number
