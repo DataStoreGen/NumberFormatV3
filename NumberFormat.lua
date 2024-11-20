@@ -10,8 +10,9 @@ local suffixes = {
 	"USg", "DSg", "TSg", "QdSg", "QnSg", "SxSg", "SpSg", "OcSg", "NoSg",
 	"Og", "UOg", "DOg", "TOg", "QdOg", "QnOg", "SxOg", "SpOg", "OcOg",
 	"NoOg", "Ng", "UNg", "DNg", "QdNg", "QnNg", "SxNg", "SpNg", "OcNg",
-	"NoNg", "Ce", "UCe"
+	"NoNg", "Ce", "UCe", 'DCe'
 }
+
 local Players = game:GetService('Players')
 local Player = Players.LocalPlayer
 
