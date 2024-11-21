@@ -1,18 +1,6 @@
-local suffixes = {
-	'', "k", "m", "b", "t", "qd", "qn", "sx", "sp",
-	"oc", "No", "De", "UDe", "DDe", "TDe", "QdDe", "QnDe", "SxDe",
-	"SpDe", "OcDe", "NoDe", "Vt", "UVt", "DVt", "TVt", "QdVt", "QnVt",
-	"SxVt", "SpVt", "OcVt", "NoVt", "Tg", "UTg", "DTg", "TTg", "QdTg",
-	"QnTg", "SxTg", "SpTg", "OcTg", "NoTg", "qg", "Uqg", "Dqg", "Tqg",
-	"Qdqg", "Qnqg", "Sxqg", "Spqg", "Ocqg", "Noqg", "Qg", "UQg", "DQg",
-	"TQg", "QdQg", "QnQg", "SxQg", "SpQg", "OcQg", "NoQg", "sg", "Usg",
-	"Dsg", "Tsg", "Qdsg", "Qnsg", "Sxsg", "Spsg", "Ocsg", "Nosg", "Sg",
-	"USg", "DSg", "TSg", "QdSg", "QnSg", "SxSg", "SpSg", "OcSg", "NoSg",
-	"Og", "UOg", "DOg", "TOg", "QdOg", "QnOg", "SxOg", "SpOg", "OcOg",
-	"NoOg", "Ng", "UNg", "DNg", "QdNg", "QnNg", "SxNg", "SpNg", "OcNg",
-	"NoNg", "Ce", "UCe", 'DCe'
-}
-
+local first = {"", "U","D","T","Qd","Qn","Sx","Sp","Oc","No"}
+local second = {"", "De","Vt","Tg","qg","Qg","sg","Sg","Og","Ng"}
+local third = {'', 'Ce'}
 local Players = game:GetService('Players')
 local Player = Players.LocalPlayer
 
@@ -165,23 +153,36 @@ function Number.toNotation(value, canRound: boolean?)
 	return man .. 'e' .. exp
 end
 
+function suffixPart(index)
+	local hun = math.floor(index/100)
+	index = index%100
+	local ten = math.floor(index/10)
+	local one = index%10
+	return (first[one+1] or '') ..
+		(second[ten+1] or '') .. 
+		(third[hun+1] or '')
+end
+
 function Number.short(value)
 	local toTable = Number.toTable(value)
-	local man, exp = toTable[1], toTable[2]
-	local SNum = math.floor(exp/3)
-	local suffix = suffixes[SNum+1]
-	if SNum == 0 then return tostring(math.floor(man * 100 + 0.001)/100)
-	elseif SNum == 1 then return Number.Comma(value) end
-	if SNum >= #suffixes then return 'inf' end
-	man = man * 10 ^(exp%3)
-	man = Number.floor(man)
-	return man .. suffix
+	local exp, man = toTable[2], toTable[1]
+	if exp < 3 then return math.floor(value * 100 + 0.001)/100 end
+	local ind = math.floor(exp/3)-1
+	if ind > 101 then return 'inf' end
+	local rm = exp%3
+	man = man*10^rm
+	if ind == 0 then
+		return string.format('%dk', man)
+	elseif ind == 1 then
+		return string.format('%dm', man)
+	end
+	return man .. suffixPart(ind)
 end
-	
+
 function Number.shortE(value: number, canRound: boolean?, canNotation: number?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
 	canNotation = canNotation or 1e6
 	if math.abs(value) >= canNotation then
-		return Number.toNotation(value, canRound)
+		return Number.toNotation(value, canRound):gsub('nane','')
 	end
 	return Number.short(value)
 end
