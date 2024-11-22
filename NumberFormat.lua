@@ -156,7 +156,7 @@ end
 function Number.shortE(value: number, canNotation: number?, canRound: boolean?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
 	canNotation = canNotation or 1e6
 	if math.abs(value) >= canNotation then return Number.toNotation(value, canRound):gsub('nane',''):gsub('+', '')	end
-	return Number.short(value)
+	return Number.short(value, canRound)
 end
 
 function Number.maxBuy(c, b, r, k)
@@ -202,11 +202,11 @@ end
 function Number.Concat(value, canNotation: number?, canRound: boolean?)
 	canNotation = canNotation or 1e6
 	canRound = canRound or true
-	if Number.meeq(value, canNotation) then
+	if value >= canNotation then
 		return Number.toNotation(value, canRound)
-	elseif Number.meeq(value, 1e6) and Number.leeq(value, canNotation) and canRound then
-		return Number.short(value)
-	elseif Number.le(value, 1e6) then
+	elseif value >= 1e6 and value <= canNotation and canRound then
+		return Number.short(value, canRound)
+	elseif value <= 1e6 then
 		return Number.Comma(value)
 	end
 end
