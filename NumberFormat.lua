@@ -145,13 +145,14 @@ function Number.short(value)
 	if ind > 101 then return 'inf' end
 	local rm = exp%3
 	man = man*10^rm
-	if ind == 0 then return string.format('%dk', man)	elseif ind == 1 then	return string.format('%dm', man)	end
+	print(ind)
+	if ind == 0 then return string.format('%dk', man)	elseif ind == 1 then	return string.format('%dm', man) elseif ind == 2 then return string.format('%db', man)	end
 	return man .. suffixPart(ind)
 end
 
 function Number.shortE(value: number, canNotation: number?, canRound: boolean?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
 	canNotation = canNotation or 1e6
-	if math.abs(value) >= canNotation then return Number.toNotation(value, canRound):gsub('nane','')	end
+	if math.abs(value) >= canNotation then return Number.toNotation(value, canRound):gsub('nane',''):gsub('+', '')	end
 	return Number.short(value)
 end
 
@@ -198,9 +199,12 @@ end
 function Number.Concat(value, canNotation: number?, canRound: boolean?)
 	canNotation = canNotation or 1e6
 	if Number.meeq(value, canNotation) then
+		return Number.toNotation(value, canRound)
+	elseif Number.leeq(value, canNotation) then
+		return Number.short(value)
+	elseif Number.leeq(value, 1e6) then
 		return Number.Comma(value)
 	end
-	return Number.shortE(value, canNotation, canRound):gsub('+','')
 end
 
 Number.__index = Number
