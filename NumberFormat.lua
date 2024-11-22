@@ -145,7 +145,7 @@ function Number.short(value)
 	if ind > 101 then return 'inf' end
 	local rm = exp%3
 	man = man*10^rm
-	print(ind)
+	man = math.floor(man * 100 + 0.001) /100
 	if ind == 0 then return string.format('%dk', man)	elseif ind == 1 then	return string.format('%dm', man) elseif ind == 2 then return string.format('%db', man)	end
 	return man .. suffixPart(ind)
 end
@@ -198,11 +198,13 @@ end
 
 function Number.Concat(value, canNotation: number?, canRound: boolean?)
 	canNotation = canNotation or 1e6
+	canRound = canRound or true
 	if Number.meeq(value, canNotation) then
 		return Number.toNotation(value, canRound)
-	elseif Number.leeq(value, canNotation) then
+	elseif Number.meeq(value, 1e6) and Number.leeq(value, canNotation) and canRound then
+		value = Number.floor(value)
 		return Number.short(value)
-	elseif Number.leeq(value, 1e6) then
+	elseif Number.le(value, 1e6) then
 		return Number.Comma(value)
 	end
 end
