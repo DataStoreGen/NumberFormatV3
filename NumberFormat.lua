@@ -137,7 +137,7 @@ function suffixPart(index)
 	return (first[one+1] or '') ..(second[ten+1] or '') .. (third[hun+1] or '')
 end
 
-function Number.short(value)
+function Number.short(value, canRound: boolean)
 	local toTable = Number.toTable(value)
 	local exp, man = toTable[2], toTable[1]
 	if exp < 3 then return math.floor(value * 100 + 0.001)/100 end
@@ -147,6 +147,9 @@ function Number.short(value)
 	man = man*10^rm
 	man = math.floor(man * 100 + 0.001) /100
 	if ind == 0 then return string.format('%dk', man)	elseif ind == 1 then	return string.format('%dm', man) elseif ind == 2 then return string.format('%db', man)	end
+	if canRound then
+		man = Number.floor(man)
+	end
 	return man .. suffixPart(ind)
 end
 
@@ -202,7 +205,6 @@ function Number.Concat(value, canNotation: number?, canRound: boolean?)
 	if Number.meeq(value, canNotation) then
 		return Number.toNotation(value, canRound)
 	elseif Number.meeq(value, 1e6) and Number.leeq(value, canNotation) and canRound then
-		value = Number.floor(value)
 		return Number.short(value)
 	elseif Number.le(value, 1e6) then
 		return Number.Comma(value)
