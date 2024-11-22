@@ -149,7 +149,7 @@ function Number.short(value)
 	return man .. suffixPart(ind)
 end
 
-function Number.shortE(value: number, canRound: boolean?, canNotation: number?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
+function Number.shortE(value: number, canNotation: number?, canRound: boolean?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
 	canNotation = canNotation or 1e6
 	if math.abs(value) >= canNotation then return Number.toNotation(value, canRound):gsub('nane','')	end
 	return Number.short(value)
@@ -195,17 +195,19 @@ function Number.Changed(value, callBack: (property: string) -> ())
 	value.Changed:Connect(callBack)
 end
 
-function Number.Concat(value, canRound: boolean?, canNotation: number?)
+function Number.Concat(value, canNotation: number?, canRound: boolean?)
 	canNotation = canNotation or 1e6
-	if value >= canNotation then return Number.shortE(value, canRound, canNotation) end
-	return Number.Comma(value)
+	if Number.meeq(value, canNotation) then
+		return Number.Comma(value)
+	end
+	return Number.shortE(value, canNotation, canRound):gsub('+','')
 end
 
 Number.__index = Number
 function Number.GetValue(valueName, Player: Player)
 	local self = setmetatable({}, Number)
 	for _, names in pairs(Player:GetDescendants()) do
-		if names.Name == valueName then
+		if names.Name == valueName and names:IsA('ValueBase') and names.Name ~= 'BoundKeys' then
 			self.Instance = names
 			self.Name = names.Name :: string
 			self.Value = names.Value :: number
@@ -215,17 +217,17 @@ function Number.GetValue(valueName, Player: Player)
 end
 
 type labels = TextLabel|TextButton
-function Number:OnChanged(callBack: (property: string, canRound: boolean?, canNotation: number?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
+function Number:OnChanged(callBack: (property: string, canNotation: number?, canRound: boolean?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
 	canRound = canRound or true
 	Number.Changed(self.Instance, function(property)
-		callBack(property, canRound, canNotation)
+		callBack(property, canNotation, canRound)
 	end)
 	if label then
 		local valueText = self.Name
 		if valueText:find('Plus') then
-			label.Text = valueText:gsub('Plus', ''):gsub(':','') ..' +' .. Number.shortE(self.Value, canRound, canNotation)
+			label.Text = valueText:gsub('Plus', ''):gsub(':','') ..' +' .. Number.Concat(self.Value, canNotation, canRound)
 		else
-			label.Text = valueText .. ': ' .. Number.shortE(self.Value, canRound, canNotation)
+			label.Text = valueText .. ': ' .. Number.Concat(self.Value, canNotation, canRound)
 		end
 	end
 end
