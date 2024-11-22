@@ -10,3 +10,5 @@ local shortE = NumberFormat.shortE(12345, true) -- non-canNotation will preset t
 --and also shortE setup for short without calling short but if u want a good Notation set Notation past 1e100
 print(shortE)-- also pre-formats Comma if its under 1m so output is 12,000 if u want to do 1m after Comma set the canNotation to 1e30
 --thats pretty much it
+local Concat = NumberFormat.Concat(1000) -- makes it so its 1,000
+print(Concat) -- should be able todo short then Notation

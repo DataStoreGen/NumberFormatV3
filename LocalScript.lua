@@ -6,11 +6,11 @@ local ClickText = script.Parent.TextLabel
 local ClickPlus = Number.GetValue('ClickPlus')
 local ClickButton = script.Parent.TextButton
 
-Clicks:OnChanged(function(newValue, canRound, canNotation)
+Clicks:OnChanged(function(newValue, canNotation, canRound)
 	ClickText.Text = 'Clicks: ' .. Number.shortE(newValue, canRound, canNotation)
 end, ClickText)
 
-ClickPlus:OnChanged(function(newValue, canRound, canNotation)
+ClickPlus:OnChanged(function(newValue, canNotation, canRound)
 	ClickButton.Text = 'Clicks +' .. Number.shortE(newValue, canRound, canNotation)
 end, ClickButton)
 
@@ -34,11 +34,11 @@ local ClickPlus = Number.GetValue('ClickPlus')
 local ClickButton = script.Parent.TextButton
 local startNotation = 1e50
 
-Clicks:OnChanged(function(newValue, canRound)
-	ClickText.Text = 'Clicks: ' .. Number.shortE(newValue, canRound)
+Clicks:OnChanged(function(newValue, canNotation, canRound)
+	ClickText.Text = 'Clicks: ' .. Number.Concat(newValue, canNotation, canRound)
 end, ClickText, startNotation, true) to setup Notation to start at 1e50
 
-ClickPlus:OnChanged(function(newValue, canRound)
-	ClickButton.Text = 'Clicks +' .. Number.shortE(newValue, canRound)
+ClickPlus:OnChanged(function(newValue, canNotation, canRound)
+	ClickButton.Text = 'Clicks +' .. Number.shortE(newValue, canNotation, canRound)
 end, ClickButton, startNotation, true)
 ]]
