@@ -1,7 +1,6 @@
 local first = {"", "U","D","T","Qd","Qn","Sx","Sp","Oc","No"}
 local second = {"", "De","Vt","Tg","qg","Qg","sg","Sg","Og","Ng"}
 local third = {'', 'Ce'}
-local CustomSuffix = require(script.CustonSuffix)
 local Number = {}
 
 function Number.eq(val1: number, val2: number)
@@ -205,7 +204,7 @@ Number.__index = Number
 function Number.GetValue(valueName, Player: Player)
 	local self = setmetatable({}, Number)
 	for _, names in pairs(Player:GetDescendants()) do
-		if names.Name == valueName then
+		if names.Name == valueName and names:IsA('ValueBase') and names.Name ~= 'BoundKeys' then
 			self.Instance = names
 			self.Name = names.Name :: string
 			self.Value = names.Value :: number
