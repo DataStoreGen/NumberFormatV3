@@ -208,9 +208,47 @@ function Number.GetValue(valueName, Player: Player)
 			self.Instance = names
 			self.Name = names.Name :: string
 			self.Value = names.Value :: number
+			self.Parent = names.Parent :: Instance
 		end
 	end
 	return self
+end
+
+function Number.lbencode(value)
+	local toTable = Number.toTable(value)
+	local man, exp = toTable[1], toTable[2]
+	if man == 0 then return 4e18 end
+	local mode = 0
+	if man < 0 then
+		mode = 1
+	elseif man > 0 then
+		mode = 2
+	end
+	local val = mode * 1e18
+	if mode == 2 then
+		val += (exp * 1e14) + (math.log10(math.abs(man))*1e13)
+	elseif mode == 1 then
+		val += (exp * 1e14) + (math.log10(math.abs(man))*1e13)
+		val = 1e17 - val
+	end
+	return val
+end
+
+function Number.lbdecode(value)
+	if value == 4e18 then return {0,0} end
+	local mode = math.floor(value/1e18)
+	if mode == 1 then
+		local v = 1e18 - value
+		local exp = math.floor(v/1e14)
+		local man = 10^((v%1e14)/1e13)
+		return Number.toNumber({-man, exp})
+	elseif mode == 2 then
+		local v = value - 2e18
+		local exp = math.floor(v/1e14)
+		local man = 10^((v%1e14)/1e13)
+		return Number.toNumber({man, exp})
+	end
+	return {math.huge, math.huge}
 end
 
 type labels = TextLabel|TextButton
@@ -222,9 +260,9 @@ function Number:OnChanged(callBack: (property: string, canRound: boolean?, canNo
 	if label then
 		local valueText = self.Name
 		if valueText:find('Plus') then
-			label.Text = valueText:gsub('Plus', ''):gsub(':','') ..' +' .. Number.shortE(self.Value, canRound, canNotation)
+			label.Text = valueText:gsub('Plus', ''):gsub(':','') ..' +' .. Number.Concat(self.Value, canRound, canNotation)
 		else
-			label.Text = valueText .. ': ' .. Number.shortE(self.Value, canRound, canNotation)
+			label.Text = valueText .. ': ' .. Number.Concat(self.Value, canRound, canNotation)
 		end
 	end
 end
