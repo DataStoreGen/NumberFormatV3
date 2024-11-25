@@ -1,7 +1,7 @@
 local first = {"", "U","D","T","Qd","Qn","Sx","Sp","Oc","No"}
 local second = {"", "De","Vt","Tg","qg","Qg","sg","Sg","Og","Ng"}
 local third = {'', 'Ce'}
-
+local CustomSuffix = require(script.CustonSuffix)
 local Number = {}
 
 function Number.eq(val1: number, val2: number)
@@ -137,26 +137,22 @@ function suffixPart(index)
 	return (first[one+1] or '') ..(second[ten+1] or '') .. (third[hun+1] or '')
 end
 
-function Number.short(value, canRound: boolean)
+function Number.short(value)
 	local toTable = Number.toTable(value)
 	local exp, man = toTable[2], toTable[1]
 	if exp < 3 then return math.floor(value * 100 + 0.001)/100 end
 	local ind = math.floor(exp/3)-1
 	if ind > 101 then return 'inf' end
 	local rm = exp%3
-	man = man*10^rm
-	man = math.floor(man * 100 + 0.001) /100
+	man = math.floor(man*10^rm * 100 + 0.001) / 100
 	if ind == 0 then return string.format('%dk', man)	elseif ind == 1 then	return string.format('%dm', man) elseif ind == 2 then return string.format('%db', man)	end
-	if canRound then
-		man = Number.floor(man)
-	end
 	return man .. suffixPart(ind)
 end
 
-function Number.shortE(value: number, canNotation: number?, canRound: boolean?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
+function Number.shortE(value: number, canRound: boolean?, canNotation: number?): 'Notation will automatic preset but if u want one smaller do it as 1e3'
 	canNotation = canNotation or 1e6
-	if math.abs(value) >= canNotation then return Number.toNotation(value, canRound):gsub('nane',''):gsub('+', '')	end
-	return Number.short(value, canRound)
+	if math.abs(value) >= canNotation then return Number.toNotation(value, canRound):gsub('nane','')	end
+	return Number.short(value)
 end
 
 function Number.maxBuy(c, b, r, k)
@@ -199,23 +195,17 @@ function Number.Changed(value, callBack: (property: string) -> ())
 	value.Changed:Connect(callBack)
 end
 
-function Number.Concat(value, canNotation: number?, canRound: boolean?)
+function Number.Concat(value, canRound: boolean?, canNotation: number?)
 	canNotation = canNotation or 1e6
-	canRound = canRound or true
-	if value >= canNotation then
-		return Number.toNotation(value, canRound)
-	elseif value >= 1e6 and value <= canNotation and canRound then
-		return Number.short(value, canRound)
-	elseif value <= 1e6 then
-		return Number.Comma(value)
-	end
+	if value >= canNotation then return Number.shortE(value, canRound, canNotation) end
+	return Number.Comma(value)
 end
 
 Number.__index = Number
 function Number.GetValue(valueName, Player: Player)
 	local self = setmetatable({}, Number)
 	for _, names in pairs(Player:GetDescendants()) do
-		if names.Name == valueName and names:IsA('ValueBase') and names.Name ~= 'BoundKeys' then
+		if names.Name == valueName then
 			self.Instance = names
 			self.Name = names.Name :: string
 			self.Value = names.Value :: number
@@ -225,17 +215,17 @@ function Number.GetValue(valueName, Player: Player)
 end
 
 type labels = TextLabel|TextButton
-function Number:OnChanged(callBack: (property: string, canNotation: number?, canRound: boolean?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
+function Number:OnChanged(callBack: (property: string, canRound: boolean?, canNotation: number?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
 	canRound = canRound or true
 	Number.Changed(self.Instance, function(property)
-		callBack(property, canNotation, canRound)
+		callBack(property, canRound, canNotation)
 	end)
 	if label then
 		local valueText = self.Name
 		if valueText:find('Plus') then
-			label.Text = valueText:gsub('Plus', ''):gsub(':','') ..' +' .. Number.Concat(self.Value, canNotation, canRound)
+			label.Text = valueText:gsub('Plus', ''):gsub(':','') ..' +' .. Number.shortE(self.Value, canRound, canNotation)
 		else
-			label.Text = valueText .. ': ' .. Number.Concat(self.Value, canNotation, canRound)
+			label.Text = valueText .. ': ' .. Number.shortE(self.Value, canRound, canNotation)
 		end
 	end
 end
