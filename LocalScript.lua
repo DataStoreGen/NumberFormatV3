@@ -7,11 +7,11 @@ local ClickPlus = Number.GetValue('ClickPlus')
 local ClickButton = script.Parent.TextButton
 
 Clicks:OnChanged(function(newValue, canNotation, canRound)
-	ClickText.Text = 'Clicks: ' .. Number.shortE(newValue, canRound, canNotation)
+	ClickText.Text = 'Clicks: ' .. Number.shortE(newValue, canNotation, canRound)
 end, ClickText)
 
 ClickPlus:OnChanged(function(newValue, canNotation, canRound)
-	ClickButton.Text = 'Clicks +' .. Number.shortE(newValue, canRound, canNotation)
+	ClickButton.Text = 'Clicks +' .. Number.shortE(newValue, canNotation, canRound)
 end, ClickButton)
 
 -- this script is an example to push for example
