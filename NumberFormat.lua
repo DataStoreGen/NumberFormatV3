@@ -144,7 +144,13 @@ function Number.short(value)
 	if ind > 101 then return 'inf' end
 	local rm = exp%3
 	man = math.floor(man*10^rm * 100 + 0.001) / 100
-	if ind == 0 then return string.format('%dk', man)	elseif ind == 1 then	return string.format('%dm', man) elseif ind == 2 then return string.format('%db', man)	end
+	if ind == 0 then
+		return man .. 'k'
+	elseif ind == 1 then
+		return man ..'m'
+	elseif ind == 2 then
+		return man .. 'b'
+	end
 	return man .. suffixPart(ind)
 end
 
@@ -200,20 +206,6 @@ function Number.Concat(value, canRound: boolean?, canNotation: number?)
 	return Number.Comma(value)
 end
 
-Number.__index = Number
-function Number.GetValue(valueName, Player: Player)
-	local self = setmetatable({}, Number)
-	for _, names in pairs(Player:GetDescendants()) do
-		if names.Name == valueName and names:IsA('ValueBase') and names.Name ~= 'BoundKeys' then
-			self.Instance = names
-			self.Name = names.Name :: string
-			self.Value = names.Value :: number
-			self.Parent = names.Parent :: Instance
-		end
-	end
-	return self
-end
-
 function Number.lbencode(value)
 	local toTable = Number.toTable(value)
 	local man, exp = toTable[1], toTable[2]
@@ -248,23 +240,40 @@ function Number.lbdecode(value)
 		local man = 10^((v%1e14)/1e13)
 		return Number.toNumber({man, exp})
 	end
-	return {math.huge, math.huge}
 end
 
-type labels = TextLabel|TextButton
-function Number:OnChanged(callBack: (property: string, canRound: boolean?, canNotation: number?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
-	canRound = canRound or true
-	Number.Changed(self.Instance, function(property)
-		callBack(property, canRound, canNotation)
-	end)
-	if label then
-		local valueText = self.Name
-		if valueText:find('Plus') then
-			label.Text = valueText:gsub('Plus', ''):gsub(':','') ..' +' .. Number.Concat(self.Value, canRound, canNotation)
-		else
-			label.Text = valueText .. ': ' .. Number.Concat(self.Value, canRound, canNotation)
+function Number.GetValue(valueName, Player: Player)
+	local class = {}
+	for _, values in pairs(Player:GetDescendants()) do
+		if values:IsA('ValueBase') and values.Name == valueName and values.Name ~= 'BoundKeys' then
+			class.Name = values.Name :: string
+			class.Value = values.Value :: number
+			class.Parent = values.Parent :: Instance
 		end
 	end
+	return class
+end
+
+function Number.Roman(value)
+	local toRoman = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1}
+	local suffix = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"}
+	local rom = ''
+	for i, val in ipairs(toRoman) do
+		while Number.meeq(value, val) do
+			rom = rom .. suffix[i]
+			value = value - val
+		end
+	end
+	return rom
+end
+
+function Number.getCurrentData(value, oldValue) -- this is for making so if u have 1000 Cash on Save and u have 100 Cash it wont update until it refreshed
+	local new = value
+	if oldValue then
+		local old = Number.lbdecode(oldValue)
+		new = Number.max(new, old)
+	end
+	return Number.lbdecode(new)
 end
 
 return Number
