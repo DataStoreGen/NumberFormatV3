@@ -267,13 +267,13 @@ function Number.Roman(value)
 	return rom
 end
 
-function Number.getCurrentData(value, oldValue) -- this is for making so if u have 1000 Cash on Save and u have 100 Cash it wont update until it refreshed
+function Number.getCurrentData(value, oldValue)
 	local new = value
 	if oldValue then
 		local old = Number.lbdecode(oldValue)
 		new = Number.max(new, old)
 	end
-	return Number.lbdecode(new)
+	return Number.lbencode(new)
 end
 
 return Number
