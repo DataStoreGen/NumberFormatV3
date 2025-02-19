@@ -242,8 +242,8 @@ function Number.lbencode(value: number): number
 	return val
 end
 
-function Number.lbdecode(value: number): number | {number}
-	if value == 4e18 then return {0,0} end
+function Number.lbdecode(value: number): number 
+	if value == 4e18 then return 0 end
 	local mode = math.floor(value/1e18)
 	if mode == 1 then
 		local v = 1e18 - value
@@ -256,7 +256,7 @@ function Number.lbdecode(value: number): number | {number}
 		local man: number = 10^((v%1e14)/1e13)
 		return Number.toNumber({man, exp})
 	end
-	return {math.huge, math.huge}
+	return math.huge
 end
 
 function Number.Roman(value: number): string
