@@ -119,7 +119,7 @@ function Number.toTable(value: number): {number}
 	return {value / 10^exp, exp}
 end
 
-function Number.toNumber(value: {number}): : number
+function Number.toNumber(value: {number}): number
 	return (value[1] * (10^value[2]))
 end
 
@@ -222,7 +222,7 @@ function Number.Concat(value: number, canRound: boolean?, canNotation: number?):
 	return Number.Comma(value)
 end
 
-function Number.lbencode(value: number)
+function Number.lbencode(value: number): number
 	local toTable = Number.toTable(value)
 	local man, exp = toTable[1], toTable[2]
 	if man == 0 then return 4e18 end
