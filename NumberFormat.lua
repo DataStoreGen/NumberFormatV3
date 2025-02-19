@@ -1,7 +1,9 @@
 --!strict
-local first = {"", "U","D","T","Qd","Qn","Sx","Sp","Oc","No"}
-local second = {"", "De","Vt","Tg","qg","Qg","sg","Sg","Og","Ng"}
-local third = {'', 'Ce'}
+local Cleanup = require(script.ModuleCleaner).new()
+local first = Cleanup:RegisterTable('first', {"", "U","D","T","Qd","Qn","Sx","Sp","Oc","No"})
+local second = Cleanup:RegisterTable('second', {"", "De","Vt","Tg","qg","Qg","sg","Sg","Og","Ng"})
+local third = Cleanup:RegisterTable('third', {'', 'Ce'})
+
 local Number = {}
 
 function Number.eq(val1: number, val2: number): boolean
@@ -116,7 +118,7 @@ end
 function Number.toTable(value: number): {number}
 	if value == 0 then return {0, 0} end
 	local exp = math.floor(math.log10(math.abs(value)))
-	return {value / 10^exp, exp}
+	return Cleanup:RegisterTable('toTable', {value / 10^exp, exp})
 end
 
 function Number.toNumber(value: {number}): number
@@ -147,7 +149,7 @@ function Number.short(value: number): string
 	if Number.between(value, 0, 1) then
 		local abs = math.abs(exp)
 		if abs < 3 then
-			return tostring(math.floor(value * 10^abs * 100 + 0.001) / 100)
+			return '1/' .. tostring(math.floor(value * 10^abs * 100 + 0.001) / 100)
 		else
 			local ind = math.floor(abs / 3) - 1
 			if ind > 101 then return 'inf' end
@@ -280,5 +282,7 @@ function Number.getCurrentData(value: number, oldValue: number)
 	end
 	return Number.lbencode(new)
 end
+
+Cleanup:RegisterTable('Cleanup', Number)
 
 return Number
